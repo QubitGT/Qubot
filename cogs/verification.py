@@ -26,6 +26,8 @@ DESCRIPTION = (
     "チェックマークをクリックして、すべてのサーバーチャンネルへのフルアクセス権を取得してください。"
 )
 
+BUTTON_EMOJI = discord.PartialEmoji(name="verify", id=1554972225973518397)
+
 CHALLENGE_SECONDS = 300
 MAX_ATTEMPTS = 3
 REQUEST_COOLDOWN = 3
@@ -53,7 +55,7 @@ class VerifyView(discord.ui.View):
 
     @discord.ui.button(
         label="Verify / 認証",
-        emoji="✅",
+        emoji=BUTTON_EMOJI,
         style=discord.ButtonStyle.primary,
         custom_id="qubot:verify",
     )
@@ -146,10 +148,8 @@ class Verification(commands.Cog):
                     message = await channel.send(embed=embed, view=VerifyView(self))
                     log.info("Posted the verification message")
                 else:
-                    current = message.embeds[0] if message.embeds else None
-                    if current is None or current.title != embed.title or current.description != embed.description:
-                        await message.edit(embed=embed, view=VerifyView(self))
-                        log.info("Updated the verification message")
+                    await message.edit(embed=embed, view=VerifyView(self))
+                    log.info("Refreshed the verification message")
 
                 self.message_id = message.id
                 self._save_state(channel.id, message.id)
