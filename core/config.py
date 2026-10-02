@@ -30,6 +30,9 @@ class Config:
     embed_warning: int = _hex_color("EMBED_WARNING", 0xFEE75C)
     embed_error: int = _hex_color("EMBED_ERROR", 0xED4245)
     auto_update: bool = (os.getenv("AUTO_UPDATE") or "true").strip().lower() not in ("0", "false", "no", "off")
+    verify_channel: int | None = int(os.getenv("VERIFY_CHANNEL") or 0) or None
+    verify_role: int | None = int(os.getenv("VERIFY_ROLE") or 0) or None
+    honeypot_channel: int | None = int(os.getenv("HONEYPOT_CHANNEL_ID") or 0) or None
     stream_url: str = os.getenv("STREAM_URL") or "https://www.twitch.tv/discord"
 
 
