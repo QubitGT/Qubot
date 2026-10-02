@@ -1,4 +1,10 @@
+from core import privacy
+
+privacy.install()
+
 import logging
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -7,8 +13,8 @@ from discord import app_commands
 from discord.ext import commands
 
 from core.config import config
-from core.embeds import make_embed
-from core.permissions import MissingRole
+from core.embeds import ERROR, make_embed
+from core.permissions import MissingRole, UserNotAllowed
 
 log = logging.getLogger("qubot")
 
@@ -23,6 +29,7 @@ class Qubot(commands.Bot):
             help_command=None,
             allowed_mentions=discord.AllowedMentions.none(),
         )
+        self.restart_requested = False
         self.tree.on_error = self.on_app_command_error
 
     async def setup_hook(self):
@@ -53,6 +60,7 @@ class Qubot(commands.Bot):
                 f"You need the following permissions: **{names}**",
                 f"次の権限が必要です：**{names}**",
                 title=("Permission Denied", "権限がありません"),
+                color=ERROR,
             )
         if isinstance(error, MissingRole):
             names = ", ".join(str(r) for r in error.roles)
@@ -60,6 +68,13 @@ class Qubot(commands.Bot):
                 f"You need one of these roles: **{names}**",
                 f"次のいずれかのロールが必要です：**{names}**",
                 title=("Permission Denied", "権限がありません"),
+                color=ERROR,
+            )
+        if isinstance(error, UserNotAllowed):
+            return make_embed(
+                "No permission.",
+                "権限がありません。",
+                color=ERROR,
             )
         if isinstance(error, commands.NoPrivateMessage):
             return make_embed(
@@ -115,7 +130,14 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     if not config.token:
         sys.exit("DISCORD_TOKEN is missing. Copy .env.example to .env and fill it in.")
-    Qubot().run(config.token, log_handler=None)
+    bot = Qubot()
+    bot.run(config.token, log_handler=None)
+    if bot.restart_requested:
+        argv = [sys.executable, *sys.argv]
+        if os.name == "nt":
+            subprocess.Popen(argv)
+            sys.exit(0)
+        os.execv(sys.executable, argv)
 
 
 if __name__ == "__main__":
