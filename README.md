@@ -38,3 +38,28 @@ async def lock(self, ctx, ...): ...
 - 権限とロールの両方を指定した場合は、両方を満たす必要があります。
 - サーバーのオーナーは常に通過します。管理者（Administrator）権限を持つユーザーはすべての権限条件を満たしますが、`roles` の条件は別途必要です。
 - DMでは使用できません。条件を満たさないユーザーには、バイリンガルの「権限がありません」Embedが表示されます（スラッシュコマンドの場合は本人にのみ表示されます）。
+
+## バックエンド連携
+`.env` の `MASUTA_API` にバックエンドのURL、`HIMITSU_KAGI` に管理者キーを設定します。
+
+## コンソールコマンド
+管理者権限（Administrator）が必要です。
+
+- `q!console add <ID> [名前]` / `/console add`: バックエンドにIDを追加します。名前を省略するとコマンド実行者の表示名が使われます。
+- `q!console del <ID> [ID ...]` / `/console del`: IDを削除します。スペース区切りで複数指定できます。`q!console remove` でも動作します。
+
+## バックエンドコマンド
+`.env` の `BOT_ADMINISTRATION` に記載したユーザーID（カンマ区切り）のみ使用できます。
+
+- `q!backend serverdata`（JSONファイルを添付）/ `/backend serverdata`: 添付したファイルでバックエンドの `serverdata.json` を丸ごと置き換えます。
+- `q!backend restart` / `/backend restart`: ボットを再起動します。
+
+## リアクションロール
+`ManageMessages` と `ManageRoles` の両方の権限が必要です。設定は `data/reactionroles.db`（SQLite）に保存され、再起動後も維持されます。
+
+- `/reactionrole add <emoji> <role> <type> <message-link>`: メッセージにリアクションロールを追加します。
+- `/reactionrole remove <reaction-id>`: リアクションロールを削除します。
+- `/reactionrole list`: このサーバーのリアクションロールを一覧表示します。
+
+タイプ: `normal`（リアクションで付与、解除で剥奪）、`unique`（そのメッセージからは1つのみ）、`verify`（付与のみ、解除しても保持）、`drop`（リアクションで剥奪）。
+自分の最上位ロール以上のロールは設定できません。ロールに特別な権限（メッセージの管理など）がある場合は確認が表示されます。
