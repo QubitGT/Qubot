@@ -9,7 +9,7 @@ from core.logs import send_log
 from core.permissions import requires
 
 MAX_IDS = 25
-ALLOWED_USERS = (1547371283933700167,)
+ALLOWED_ROLES = (1547371283933700167,)
 
 
 def clean_id(raw: str) -> str:
@@ -31,7 +31,7 @@ class Console(commands.Cog):
         description="Manage console admin IDs. / コンソール管理者IDを管理します。",
         invoke_without_command=True,
     )
-    @requires(users=ALLOWED_USERS)
+    @requires(roles=ALLOWED_ROLES)
     async def console(self, ctx: commands.Context):
         p = ctx.clean_prefix
         await ctx.reply(
@@ -44,7 +44,7 @@ class Console(commands.Cog):
         )
 
     @console.command(name="add", description="Add an ID to the backend. / バックエンドにIDを追加します。")
-    @requires(users=ALLOWED_USERS)
+    @requires(roles=ALLOWED_ROLES)
     async def add(self, ctx: commands.Context, id: str, *, name: str | None = None):
         await ctx.defer()
 
@@ -100,7 +100,7 @@ class Console(commands.Cog):
         aliases=["remove"],
         description="Remove IDs from the backend (space separated). / バックエンドからIDを削除します（スペース区切り）。",
     )
-    @requires(users=ALLOWED_USERS)
+    @requires(roles=ALLOWED_ROLES)
     async def remove(self, ctx: commands.Context, *, ids: str):
         await ctx.defer()
 
