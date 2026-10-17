@@ -65,6 +65,22 @@ class Backend:
         status, _ = await self._request("POST", "/setserverdata", {"data": data})
         return status == 200
 
+    async def notify(self, message: str, seconds: int) -> bool:
+        status, _ = await self._request("POST", "/notify", {"message": message, "time": seconds})
+        return status == 200
+
+    async def invite(self, code: str, count: int | None = None) -> bool:
+        if count:
+            status, _ = await self._request("POST", "/inviterandom", {"to": code, "count": count})
+        else:
+            status, _ = await self._request("POST", "/inviteall", {"to": code})
+        return status == 200
+
+    async def user_count(self) -> int | None:
+        status, data = await self._request("GET", "/usercount", auth=False)
+        users = data.get("users")
+        return users if status == 200 and isinstance(users, int) else None
+
     async def admin_ids(self) -> set[str]:
         status, data = await self._request("GET", "/serverdata", auth=False)
         admins = data.get("admins", []) if status == 200 else []
